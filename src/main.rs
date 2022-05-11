@@ -1,6 +1,6 @@
 use std::{env::args, fs, os::unix::fs::DirEntryExt, path::Path};
 
-use clap::{App, Arg, Command};
+use clap::{Arg, Command};
 
 use resolve_path::PathResolveExt;
 
