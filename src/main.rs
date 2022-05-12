@@ -1,8 +1,12 @@
 use std::{env::args, fs, os::unix::fs::DirEntryExt, path::Path};
 
-use clap::{Arg, Command};
+use clap::{Arg, Command, Parser};
 
 use resolve_path::PathResolveExt;
+
+use crate::args::RoundsArgs;
+
+mod args;
 
 fn main() {
     const CONFIG_PATH: &str = "~/.config/rounds_mod_downloader";
@@ -20,20 +24,11 @@ fn main() {
         .expect("couldnt create config directory");
     }
 
-    let plugin_path = args().next().expect("please provide your plugin path");
+    let args = RoundsArgs::parse();
 
-    let matches = Command::new("Rounds Mod Downloader")
-        .version("1.0")
-        .about("CLI for downloading mods from thunderstore.io")
-        .subcommand(
-            Command::new("download")
-                .about("Download mod by providing a mod_id")
-                .arg(
-                    Arg::new("mod_id")
-                        .short('i')
-                        .value_name("MOD_ID")
-                        .help("provide a mod_id to download the mod"),
-                ),
-        )
-        .get_matches();
+    match args.entity_type {
+        args::EntityType::Download(c) => {
+            println!("{:?}",c);
+        },
+    }
 }
