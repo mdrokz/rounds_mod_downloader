@@ -17,7 +17,7 @@ pub enum EntityType {
 
 pub struct ResolveDownload;
 
-const ROUNDS_PATH: &'static str = "~/.steam/steam/steamapps/common/ROUNDSs";
+const ROUNDS_PATH: &'static str = "~/.steam/steam/steamapps/common/ROUNDS/BepInEx/plugins";
 
 impl ResolveDownload {
     fn resolve() -> &'static str {
