@@ -6,6 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = {version = '3.1.17',features = ["derive"]}
+clap = { version = '3.1.17', features = ["derive"] }
 resolve-path = '0.1.0'
 attohttpc = '0.19.1'
+unzip = {git = 'https://github.com/mdrokz/unzip-rs'}
+# zip = { version = '0.6.2', features = ["deflate", "zstd", "bzip2"] }
