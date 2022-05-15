@@ -1,12 +1,13 @@
-use std::{env::args, fs, os::unix::fs::DirEntryExt, path::Path};
 
-use clap::{Arg, Command, Parser};
+use clap::{Parser};
 
 use resolve_path::PathResolveExt;
 
-use crate::args::RoundsArgs;
+use crate::{args::RoundsArgs};
 
 mod args;
+
+mod types;
 
 fn main() {
     const CONFIG_PATH: &str = "~/.config/rounds_mod_downloader";
@@ -29,38 +30,20 @@ fn main() {
 
     match args.entity_type {
         args::EntityType::Download(c) => {
-            let (download_path, mod_id) = (
-                c.download_path
-                    .try_resolve()
-                    .expect("failed to resolve home path"),
-                c.mod_id,
-            );
+            let download_path = c
+                .download_path
+                .try_resolve()
+                .expect("failed to resolve home path");
 
             if !download_path.is_dir() {
                 panic!("Provided directory {:?} does not exist", download_path);
             }
 
-            let mod_resp = attohttpc::get(format!("{}/{}", DOWNLOAD_URL, mod_id))
-                .send()
-                .expect("failed to download mod");
+            println!("Starting Download...");
 
-            let headers = mod_resp.headers();
+            c.download_mod(DOWNLOAD_URL.to_string(), download_path, None);
 
-            let file_type = headers
-                .get("content-type")
-                .expect("failed to get content-type")
-                .to_str()
-                .and_then(|x| {
-                    let content_type = String::from(x);
-                    let mut c_split = content_type.split("/");
-                    let ctype = c_split.next().expect("failed to get value");
-                    Ok(ctype.to_string())
-                })
-                .expect("failed to convert to string");
-
-            
-
-            println!("{:?}", mod_resp.headers());
+            println!("Completed Download...");
         }
     }
 }
