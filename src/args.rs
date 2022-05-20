@@ -1,6 +1,6 @@
 use std::{
     borrow::Cow,
-    fs::{read_to_string, remove_dir_all},
+    fs::{read_to_string, remove_dir_all, DirEntry},
     io::Write,
     path::Path,
 };
@@ -55,13 +55,13 @@ impl DownloadCommand {
     ) {
         // let plugins = fs::read_dir(&download_path).expect("failed to read plugins directory");
 
-        let (mod_id, split) = if let Some(id) = dep_id {
-            (id, "-")
+        let mod_id = if let Some(id) = dep_id {
+            id
         } else {
-            (self.mod_id.clone(), "/")
+            self.mod_id.clone()
         };
 
-        let mut name_split = mod_id.split(split);
+        let mut name_split = mod_id.split("-");
 
         name_split.next();
 
@@ -118,12 +118,35 @@ impl DownloadCommand {
     }
 
     pub fn download_deps(&self, download_url: String, download_path: Cow<Path>, deps: Vec<String>) {
+        let plugins = fs::read_dir(&download_path)
+            .expect("failed to read plugins directory")
+            .map(|x| x.expect("failed to read entry"))
+            .collect::<Vec<DirEntry>>();
+
+        let mut deps = deps;
         println!("Fetching Dependencies...");
         // let threads = deps.iter().map(|dep| {
         //     std::thread::spawn(move || {
         //         self.download_mod(download_url.clone(), download_path.clone(), Some(dep))
         //     })
         // }).collect::<Vec<JoinHandle<()>>>();
+        let deps = deps
+            .drain_filter(|dep| {
+                let mut x = true;
+
+                for plugin in &plugins {
+                    if dep.contains(plugin.file_name().to_str().expect("failed to read plugin")) {
+                        x = false;
+                        break;
+                    } else {
+                        x = true;
+                        continue;
+                    }
+                }
+
+                x
+            })
+            .collect::<Vec<String>>();
 
         for dep in deps {
             self.download_mod(download_url.clone(), download_path.clone(), Some(dep));
