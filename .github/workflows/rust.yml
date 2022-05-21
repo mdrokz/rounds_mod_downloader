@@ -1,24 +1,61 @@
-name: Rust
+name: Rounds Mod Downloader Release
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches: [master]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
+  version:
+    name: Create version number
     runs-on: ubuntu-latest
-
     steps:
+    - uses: actions/checkout@v1
+    - name: Fetch all history for all tags and branches
+      run: |
+        git fetch --prune --depth=10000
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0.9.6
+      with:
+        versionSpec: '5.x'
+    - name: Use GitVersion
+      id: gitversion
+      uses: gittools/actions/gitversion/execute@v0.9.6
+    - name: Create version.txt with nuGetVersion
+      run: echo ${{ steps.gitversion.outputs.nuGetVersion  }} > version.txt
+    - name: Upload version.txt
+      uses: actions/upload-artifact@v2
+      with:
+        name: gitversion
+        path: version.txt
+
+  build:
+    name: Build Binary and Create release
+    needs: [ version ]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get version.txt
+      uses: actions/download-artifact@v2
+      with:
+        name: gitversion
+    - name: Read version
+      id: version
+      uses: juliangruber/read-file-action@v1
+      with:
+        path: version.txt
     - uses: actions/checkout@v3
     - name: Nightly
       run: rustup default nightly
-    - name: Build
-      run: cargo build --release --verbose
     - name: Run tests
       run: cargo test --verbose
+    - name: Build Release
+      run: cargo build --release --verbose
+    - name: Create a Release in GitHub
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "target/debug/rounds_mod_downloader"
+        token: ${{ secrets.GH_TOKEN }}
+        tag: ${{ steps.version.outputs.content }}
+        commit: ${{ github.sha }}
