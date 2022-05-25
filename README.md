@@ -26,3 +26,9 @@ rounds_mod_downloader download -d <download_path> -m <mod_id>
 # Development
 
 Use rust nightly toolchain for development
+
+# Latest Release
+
+Linux -
+
+https://github.com/mdrokz/rounds_mod_downloader/releases/download/0.1.3/rounds_mod_downloader
