@@ -52,6 +52,8 @@ jobs:
       run: cargo test --verbose
     - name: Build Release
       run: cargo build --release --verbose
+    - name: Print directory (debug)
+      run: ls
     - name: Create a Release in GitHub
       uses: ncipollo/release-action@v1
       with:
