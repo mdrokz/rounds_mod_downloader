@@ -52,12 +52,10 @@ jobs:
       run: cargo test --verbose
     - name: Build Release
       run: cargo build --release --verbose
-    - name: Print directory (debug)
-      run: ls target/debug
     - name: Create a Release in GitHub
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "target/debug/rounds_mod_downloader"
+        artifacts: "target/release/rounds_mod_downloader"
         token: ${{ secrets.GH_TOKEN }}
         tag: ${{ steps.version.outputs.content }}
         commit: ${{ github.sha }}
